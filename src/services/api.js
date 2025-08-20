@@ -39,6 +39,7 @@ const signin = (username, password) =>
   });
 
 const getWebsites = () => request('/websites');
+const me = () => request('/me');
 
 const createWebsite = (url) =>
   request('/websites', {
@@ -55,6 +56,7 @@ export const api = {
   getWebsites,
   createWebsite,
   getWebsiteStatus,
+  me
 };
 
 

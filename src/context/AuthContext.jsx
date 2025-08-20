@@ -34,6 +34,14 @@ export const AuthProvider = ({ children }) => {
       return { success: false, error: error.message };
     }
   };
+  const me = async () =>{
+    try{
+      await api.me();
+      return {success:true};
+    }catch(error){
+      return {success:false, error:error.message};
+    }
+  }
 
   const logout = () => {
     localStorage.removeItem('token');
