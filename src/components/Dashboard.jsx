@@ -22,8 +22,18 @@ export const Dashboard = () => {
 
   // Check if user has email and show modal if not
   useEffect(() => {
-    if (userProfile && (!userProfile.email || userProfile.email.trim() === '')) {
-      setShowEmailModal(true);
+    console.log('User profile changed:', userProfile); // Debug log
+    if (userProfile) {
+      const hasEmail = userProfile.email && userProfile.email.trim() !== '';
+      console.log('Has email:', hasEmail, 'Email value:', userProfile.email); // Debug log
+      
+      if (!hasEmail) {
+        console.log('No email found, showing modal');
+        setShowEmailModal(true);
+      } else {
+        console.log('Email exists, hiding modal');
+        setShowEmailModal(false);
+      }
     }
   }, [userProfile]);
 
@@ -50,8 +60,14 @@ export const Dashboard = () => {
   };
 
   const handleEmailUpdated = async (email) => {
-    await updateUserEmail(email);
-    setShowEmailModal(false);
+    console.log('Updating email to:', email);
+    const result = await updateUserEmail(email);
+    if (result.success) {
+      console.log('Email updated successfully, closing modal');
+      setShowEmailModal(false);
+    } else {
+      console.error('Failed to update email:', result.error);
+    }
   };
 
   const getOverallStatus = () => {
@@ -193,6 +209,7 @@ export const Dashboard = () => {
       <EmailModal 
         isOpen={showEmailModal} 
         onClose={() => {
+          // Only allow closing if user has email
           if (userProfile?.email && userProfile.email.trim() !== '') {
             setShowEmailModal(false);
           }

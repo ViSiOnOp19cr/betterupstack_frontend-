@@ -12,7 +12,6 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem('token');
     if (token) {
       setUser({ token });
-      // Fetch user profile when token exists
       fetchUserProfile();
     } else {
       setLoading(false);
@@ -25,7 +24,6 @@ export const AuthProvider = ({ children }) => {
       setUserProfile(profile);
     } catch (error) {
       console.error('Failed to fetch user profile:', error);
-      // If token is invalid, logout
       logout();
     } finally {
       setLoading(false);
@@ -37,8 +35,7 @@ export const AuthProvider = ({ children }) => {
       const response = await api.signin(username, password);
       localStorage.setItem('token', response.token);
       setUser({ token: response.token });
-      
-      // Fetch user profile after login
+
       try {
         const profile = await api.me();
         setUserProfile(profile);
@@ -65,8 +62,12 @@ export const AuthProvider = ({ children }) => {
     try {
       await api.updateEmail(email);
       setUserProfile(prev => ({ ...prev, email }));
+
+      await fetchUserProfile();
+      
       return { success: true };
     } catch (error) {
+      console.error('Failed to update email:', error);
       return { success: false, error: error.message };
     }
   };

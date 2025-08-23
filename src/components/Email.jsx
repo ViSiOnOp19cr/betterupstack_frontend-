@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { api } from '../services/api';
 import { LoadingSpinner } from './LoadingSpinner';
 
 export const EmailModal = ({ isOpen, onClose, onEmailUpdated }) => {
@@ -13,12 +12,13 @@ export const EmailModal = ({ isOpen, onClose, onEmailUpdated }) => {
     setError('');
     
     try {
-      await api.updateEmail(email);
-      onEmailUpdated?.(email);
+      console.log('Submitting email:', email);
+      await onEmailUpdated?.(email);
+      console.log('Email updated successfully, resetting form');
       setEmail('');
-      onClose?.();
     } catch (err) {
-      setError(err.message);
+      console.error('Error updating email:', err);
+      setError(err.message || 'Failed to update email');
     } finally {
       setLoading(false);
     }
