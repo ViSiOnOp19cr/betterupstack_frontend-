@@ -5,7 +5,7 @@ import { LoadingSpinner } from './LoadingSpinner';
 import { StatusBadge } from './StatusBadge';
 import { AddWebsiteModal } from './AddWebsiteModal';
 import { WebsiteDetailsModal } from './WebsiteDetailsModal';
-
+import { EmailModal } from './Email';
 
 export const Dashboard = () => {
   const [websites, setWebsites] = useState([]);
@@ -13,11 +13,19 @@ export const Dashboard = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedWebsite, setSelectedWebsite] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const { logout } = useAuth();
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const { logout, userProfile, updateUserEmail } = useAuth();
 
   useEffect(() => {
     void loadWebsites();
   }, []);
+
+  // Check if user has email and show modal if not
+  useEffect(() => {
+    if (userProfile && (!userProfile.email || userProfile.email.trim() === '')) {
+      setShowEmailModal(true);
+    }
+  }, [userProfile]);
 
   const loadWebsites = async () => {
     try {
@@ -41,6 +49,11 @@ export const Dashboard = () => {
     setShowDetailsModal(true);
   };
 
+  const handleEmailUpdated = async (email) => {
+    await updateUserEmail(email);
+    setShowEmailModal(false);
+  };
+
   const getOverallStatus = () => {
     if (websites.length === 0) return 'unknown';
     const allUp = websites.every((w) => w.latest_status === 'Up');
@@ -58,10 +71,31 @@ export const Dashboard = () => {
               <h1 className="text-xl font-semibold">Upgaurd</h1>
             </div>
             <div className="flex items-center space-x-4">
+              {userProfile && (
+                <div className="flex items-center space-x-2 text-sm text-slate-300">
+                  <i className="fas fa-user-circle" />
+                  <span>{userProfile.username}</span>
+                  {userProfile.email && (
+                    <>
+                      <span>•</span>
+                      <span className="text-slate-400">{userProfile.email}</span>
+                    </>
+                  )}
+                </div>
+              )}
               <button onClick={() => setShowAddModal(true)} className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-md text-sm font-medium">
                 <i className="fas fa-plus mr-2" />
                 Add Website
               </button>
+              {userProfile?.email && (
+                <button 
+                  onClick={() => setShowEmailModal(true)} 
+                  className="text-slate-300 hover:text-white"
+                  title="Update Email"
+                >
+                  <i className="fas fa-envelope" />
+                </button>
+              )}
               <button onClick={logout} className="text-slate-300 hover:text-white">
                 <i className="fas fa-sign-out-alt" />
               </button>
@@ -156,8 +190,15 @@ export const Dashboard = () => {
 
       <AddWebsiteModal isOpen={showAddModal} onClose={() => setShowAddModal(false)} onAdd={handleAddWebsite} />
       <WebsiteDetailsModal website={selectedWebsite} isOpen={showDetailsModal} onClose={() => setShowDetailsModal(false)} />
+      <EmailModal 
+        isOpen={showEmailModal} 
+        onClose={() => {
+          if (userProfile?.email && userProfile.email.trim() !== '') {
+            setShowEmailModal(false);
+          }
+        }} 
+        onEmailUpdated={handleEmailUpdated} 
+      />
     </div>
   );
 };
-
-

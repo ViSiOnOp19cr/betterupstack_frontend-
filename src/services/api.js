@@ -39,7 +39,13 @@ const signin = (username, password) =>
   });
 
 const getWebsites = () => request('/websites');
-const me = () => request('/me');
+const me = () => request('/auth/me');
+
+const updateEmail = (email) =>
+  request('/websites/update', {
+    method: 'PUT',
+    body: JSON.stringify({ email }),
+  });
 
 const createWebsite = (url) =>
   request('/websites', {
@@ -56,7 +62,8 @@ export const api = {
   getWebsites,
   createWebsite,
   getWebsiteStatus,
-  me
+  me,
+  updateEmail
 };
 
 

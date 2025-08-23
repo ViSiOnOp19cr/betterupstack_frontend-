@@ -5,21 +5,47 @@ const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
       setUser({ token });
+      // Fetch user profile when token exists
+      fetchUserProfile();
+    } else {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
+
+  const fetchUserProfile = async () => {
+    try {
+      const profile = await api.me();
+      setUserProfile(profile);
+    } catch (error) {
+      console.error('Failed to fetch user profile:', error);
+      // If token is invalid, logout
+      logout();
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const login = async (username, password) => {
     try {
       const response = await api.signin(username, password);
       localStorage.setItem('token', response.token);
       setUser({ token: response.token });
+      
+      // Fetch user profile after login
+      try {
+        const profile = await api.me();
+        setUserProfile(profile);
+      } catch (error) {
+        console.error('Failed to fetch user profile after login:', error);
+      }
+      
       return { success: true };
     } catch (error) {
       return { success: false, error: error.message };
@@ -34,22 +60,34 @@ export const AuthProvider = ({ children }) => {
       return { success: false, error: error.message };
     }
   };
-  const me = async () =>{
-    try{
-      await api.me();
-      return {success:true};
-    }catch(error){
-      return {success:false, error:error.message};
+
+  const updateUserEmail = async (email) => {
+    try {
+      await api.updateEmail(email);
+      setUserProfile(prev => ({ ...prev, email }));
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
     }
-  }
+  };
 
   const logout = () => {
     localStorage.removeItem('token');
     setUser(null);
+    setUserProfile(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, signup, logout, loading }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      userProfile, 
+      login, 
+      signup, 
+      logout, 
+      loading, 
+      updateUserEmail,
+      refreshProfile: fetchUserProfile 
+    }}>
       {children}
     </AuthContext.Provider>
   );
@@ -62,5 +100,3 @@ export const useAuth = () => {
   }
   return context;
 };
-
-
