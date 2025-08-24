@@ -12,9 +12,7 @@ export const EmailModal = ({ isOpen, onClose, onEmailUpdated }) => {
     setError('');
     
     try {
-      console.log('Submitting email:', email);
       await onEmailUpdated?.(email);
-      console.log('Email updated successfully, resetting form');
       setEmail('');
     } catch (err) {
       console.error('Error updating email:', err);

@@ -22,16 +22,12 @@ export const Dashboard = () => {
 
   // Check if user has email and show modal if not
   useEffect(() => {
-    console.log('User profile changed:', userProfile); // Debug log
     if (userProfile) {
       const hasEmail = userProfile.email && userProfile.email.trim() !== '';
-      console.log('Has email:', hasEmail, 'Email value:', userProfile.email); // Debug log
       
       if (!hasEmail) {
-        console.log('No email found, showing modal');
         setShowEmailModal(true);
       } else {
-        console.log('Email exists, hiding modal');
         setShowEmailModal(false);
       }
     }
@@ -60,10 +56,8 @@ export const Dashboard = () => {
   };
 
   const handleEmailUpdated = async (email) => {
-    console.log('Updating email to:', email);
     const result = await updateUserEmail(email);
     if (result.success) {
-      console.log('Email updated successfully, closing modal');
       setShowEmailModal(false);
     } else {
       console.error('Failed to update email:', result.error);
