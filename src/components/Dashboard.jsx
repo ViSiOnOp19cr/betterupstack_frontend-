@@ -1,26 +1,24 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import { LoadingSpinner } from './LoadingSpinner';
 import { StatusBadge } from './StatusBadge';
-import { AddWebsiteModal } from './AddWebsiteModal';
-import { WebsiteDetailsModal } from './WebsiteDetailsModal';
+import { AddWebsiteModal } from './AddWebsiteModal'; // Re-added this import
 import { EmailModal } from './Email';
 
 export const Dashboard = () => {
   const [websites, setWebsites] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [selectedWebsite, setSelectedWebsite] = useState(null);
-  const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showEmailModal, setShowEmailModal] = useState(false);
   const { logout, userProfile, updateUserEmail } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     void loadWebsites();
   }, []);
 
-  // Check if user has email and show modal if not
   useEffect(() => {
     if (userProfile) {
       const hasEmail = userProfile.email && userProfile.email.trim() !== '';
@@ -50,9 +48,8 @@ export const Dashboard = () => {
     setShowAddModal(false);
   };
 
-  const handleViewDetails = (website) => {
-    setSelectedWebsite(website);
-    setShowDetailsModal(true);
+  const handleWebsiteClick = (website) => {
+    navigate(`/website/${website.id}`);
   };
 
   const handleEmailUpdated = async (email) => {
@@ -167,27 +164,35 @@ export const Dashboard = () => {
             ) : (
               <ul className="divide-y divide-white/10">
                 {websites.map((website) => (
-                  <li key={website.id} className="px-4 py-4 hover:bg-white/5">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0">
-                          <StatusBadge status={website.latest_status} />
-                        </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium">{website.url}</div>
-                          <div className="text-sm text-slate-400">
-                            Added {new Date(website.time_added).toLocaleDateString()}
-                            {website.last_checked && <> • Last checked {new Date(website.last_checked).toLocaleString()}</>}
+                  <li key={website.id}>
+                    <div 
+                      className="px-4 py-4 hover:bg-white/5 cursor-pointer transition-colors duration-150"
+                      onClick={() => handleWebsiteClick(website)}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center flex-1">
+                          <div className="flex-shrink-0">
+                            <StatusBadge status={website.latest_status} />
+                          </div>
+                          <div className="ml-4 flex-1">
+                            <div className="text-sm font-medium hover:text-indigo-300 transition-colors">{website.url}</div>
+                            <div className="text-sm text-slate-400">
+                              Added {new Date(website.time_added).toLocaleDateString()}
+                              {website.last_checked && <> • Last checked {new Date(website.last_checked).toLocaleString()}</>}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <button onClick={() => handleViewDetails(website)} className="text-indigo-400 hover:text-indigo-300 text-sm font-medium">
-                          View Details
-                        </button>
-                        <a href={website.url} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-white">
-                          <i className="fas fa-external-link-alt" />
-                        </a>
+                        <div className="flex items-center space-x-2">
+                          <a 
+                            href={website.url} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="text-slate-400 hover:text-white"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <i className="fas fa-external-link-alt" />
+                          </a>
+                        </div>
                       </div>
                     </div>
                   </li>
@@ -198,12 +203,16 @@ export const Dashboard = () => {
         </div>
       </main>
 
-      <AddWebsiteModal isOpen={showAddModal} onClose={() => setShowAddModal(false)} onAdd={handleAddWebsite} />
-      <WebsiteDetailsModal website={selectedWebsite} isOpen={showDetailsModal} onClose={() => setShowDetailsModal(false)} />
+      {/* Re-added the AddWebsiteModal component */}
+      <AddWebsiteModal 
+        isOpen={showAddModal} 
+        onClose={() => setShowAddModal(false)} 
+        onAdd={handleAddWebsite} 
+      />
+
       <EmailModal 
         isOpen={showEmailModal} 
         onClose={() => {
-          // Only allow closing if user has email
           if (userProfile?.email && userProfile.email.trim() !== '') {
             setShowEmailModal(false);
           }

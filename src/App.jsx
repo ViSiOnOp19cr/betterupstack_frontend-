@@ -3,6 +3,7 @@ import { useAuth } from './context/AuthContext';
 import { Dashboard } from './components/Dashboard';
 import { LoginForm } from './components/LoginForm';
 import { Landing } from './components/Landing';
+import { WebsiteDetails } from './components/WebsiteDetails';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 function App() {
@@ -49,6 +50,14 @@ function App() {
         element={
           <RequireAuth>
             <Dashboard />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/website/:id"
+        element={
+          <RequireAuth>
+            <WebsiteDetails />
           </RequireAuth>
         }
       />
