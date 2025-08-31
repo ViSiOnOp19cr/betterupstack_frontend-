@@ -4,6 +4,7 @@ import { Dashboard } from './components/Dashboard';
 import { LoginForm } from './components/LoginForm';
 import { Landing } from './components/Landing';
 import { WebsiteDetails } from './components/WebsiteDetails';
+import { AuthSuccess } from './components/AuthSuccess'; 
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 function App() {
@@ -45,6 +46,11 @@ function App() {
           </RedirectIfAuthed>
         }
       />
+      {/* New OAuth success route */}
+      <Route
+        path="/auth/success"
+        element={<AuthSuccess />}
+      />
       <Route
         path="/dashboard"
         element={
@@ -66,4 +72,4 @@ function App() {
   );
 }
 
-export default App
+export default App;

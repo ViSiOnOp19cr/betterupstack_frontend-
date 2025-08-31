@@ -72,6 +72,17 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const handleOAuthSuccess = async (token) => {
+    localStorage.setItem('token', token);
+    try {
+      const userData = await api.me();
+      setUser(userData);
+    } catch (error) {
+      console.error('Failed to get user data after OAuth:', error);
+      localStorage.removeItem('token');
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('token');
     setUser(null);
@@ -86,6 +97,7 @@ export const AuthProvider = ({ children }) => {
       signup, 
       logout, 
       loading, 
+      handleOAuthSuccess,
       updateUserEmail,
       refreshProfile: fetchUserProfile 
     }}>
