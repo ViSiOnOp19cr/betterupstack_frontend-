@@ -60,6 +60,7 @@ export const AuthProvider = ({ children }) => {
 
   const updateUserEmail = async (email) => {
     try {
+      console.log('Updating email with: in auth context', email);
       await api.updateEmail(email);
       setUserProfile(prev => ({ ...prev, email }));
 

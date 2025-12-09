@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3005/api/v1';
+const API_BASE_URL = 'http://localhost:3005/api/v1';
 
 const request = async (endpoint, options = {}) => {
   const token = localStorage.getItem('token');
@@ -42,11 +42,13 @@ const initiateGoogleAuth = () => {
 
 const getWebsites = () => request('/websites');
 const me = () => request('/auth/me');
+
 const updateEmail = (email) =>
   request('/websites/update', {
     method: 'PUT',
     body: JSON.stringify({ email }),
   });
+
 const createWebsite = (url) =>
   request('/websites', {
     method: 'POST',
